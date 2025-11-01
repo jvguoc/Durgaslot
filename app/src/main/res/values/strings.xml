@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Durgaslot</string>
+    <string name="spin">Girar (1 ficha)</string>
+    <string name="cash_out">Terminar</string>
+    <string name="chips">Fichas</string>
+    <string name="max">Máximo</string>
+    <string name="last_prize">Premio último giro</string>
+    <string name="slot_title">SLOT MACHINE</string>
+</resources>
