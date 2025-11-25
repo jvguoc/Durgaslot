@@ -77,4 +77,5 @@ dependencies {
 
     // Iconos extendidos (flecha back)
     implementation("androidx.compose.material:material-icons-extended:1.7.5")
+
 }
