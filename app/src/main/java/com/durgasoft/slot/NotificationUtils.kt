@@ -20,7 +20,8 @@ object NotificationUtils {
 
     fun createChannel(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            val manager =
+                context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
             val existing = manager.getNotificationChannel(CHANNEL_ID)
             if (existing != null) return
@@ -42,7 +43,7 @@ object NotificationUtils {
         chips: Int,
         maxChips: Int
     ) {
-        // test
+        // Check permiso en Android 13+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             val granted = ContextCompat.checkSelfPermission(
                 context,
@@ -50,7 +51,6 @@ object NotificationUtils {
             ) == PackageManager.PERMISSION_GRANTED
 
             if (!granted) {
-                // test
                 return
             }
         }

@@ -20,21 +20,28 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.math.floor
 import kotlin.math.roundToInt
+import androidx.core.view.drawToBitmap
+import com.durgasoft.slot.GalleryUtils
+import com.durgasoft.slot.NotificationUtils
 
 @Composable
 fun SlotApp(
     onBack: () -> Unit = {}
 ) {
     val ctx = LocalContext.current
+    val view = LocalView.current
     val vm: SlotViewModel = viewModel(factory = SlotVMFactory(ctx))
     val ui = vm.ui
 
@@ -134,7 +141,6 @@ fun SlotApp(
                         val t = vm.requestSpin()
                         if (t.isEmpty()) return@Button
 
-                        // so al premer el boto
                         SlotSoundManager.playSpin()
 
                         scope.launch {
@@ -145,7 +151,6 @@ fun SlotApp(
                             val finalTargets = listOf(idx(reelA), idx(reelB), idx(reelC))
                             vm.finalizeSpin(finalTargets)
 
-                            // notificacio si hi ha premi
                             val prize = vm.ui.lastWin
                             if (prize > 0) {
                                 NotificationUtils.showWinNotification(
@@ -154,6 +159,18 @@ fun SlotApp(
                                     chips = vm.ui.chips,
                                     maxChips = vm.ui.maxChips
                                 )
+
+                                // capturar pantalla
+                                val bitmap = view.drawToBitmap()
+
+                                // notif
+                                withContext(Dispatchers.IO) {
+                                    GalleryUtils.saveVictoryScreenshot(ctx, bitmap)
+                                }
+
+                                // calendar
+                                CalendarUtils.insertVictoryEvent(ctx, prize)
+
                             }
                         }
                     }

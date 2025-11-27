@@ -19,6 +19,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.durgasoft.slot.NotificationUtils
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -30,6 +31,8 @@ class MainActivity : ComponentActivity() {
         NotificationUtils.createChannel(applicationContext) // test notificacio
 
         requestNotificationPermissionIfNeeded() // demanar permis per notifs abans de setContent
+        requestCalendarPermissionsIfNeeded()    // demanar permis per calendar
+
 
         setContent {
             MaterialTheme {
@@ -124,5 +127,22 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+    // test demanar permis calendar (API >=33)
+    private fun requestCalendarPermissionsIfNeeded() {
+        val perms = arrayOf(
+            Manifest.permission.READ_CALENDAR,
+            Manifest.permission.WRITE_CALENDAR
+        )
+
+        val missing = perms.any {
+            ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED
+        }
+
+        if (missing) {
+            ActivityCompat.requestPermissions(this, perms, 200)
+        }
+    }
+
 
 }
