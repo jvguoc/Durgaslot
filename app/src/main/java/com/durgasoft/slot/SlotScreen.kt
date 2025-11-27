@@ -10,6 +10,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -27,16 +29,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
 import kotlin.math.floor
 import kotlin.math.roundToInt
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 
 @Composable
 fun SlotApp(
     onBack: () -> Unit = {}
 ) {
-    val vm: SlotViewModel = viewModel(factory = SlotVMFactory(LocalContext.current))
+    val ctx = LocalContext.current
+    val vm: SlotViewModel = viewModel(factory = SlotVMFactory(ctx))
     val ui = vm.ui
 
     val n = vm.symbols.size
@@ -58,7 +57,12 @@ fun SlotApp(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text(stringResource(R.string.slot_title), fontWeight = FontWeight.ExtraBold) },
+                title = {
+                    Text(
+                        stringResource(R.string.slot_title),
+                        fontWeight = FontWeight.ExtraBold
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
@@ -94,14 +98,30 @@ fun SlotApp(
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    ReelBox(symbol = vm.symbols[idx(reelA)], spinning = ui.spinning, modifier = Modifier.weight(1f))
-                    ReelBox(symbol = vm.symbols[idx(reelB)], spinning = ui.spinning, modifier = Modifier.weight(1f))
-                    ReelBox(symbol = vm.symbols[idx(reelC)], spinning = ui.spinning, modifier = Modifier.weight(1f))
+                    ReelBox(
+                        symbol = vm.symbols[idx(reelA)],
+                        spinning = ui.spinning,
+                        modifier = Modifier.weight(1f)
+                    )
+                    ReelBox(
+                        symbol = vm.symbols[idx(reelB)],
+                        spinning = ui.spinning,
+                        modifier = Modifier.weight(1f)
+                    )
+                    ReelBox(
+                        symbol = vm.symbols[idx(reelC)],
+                        spinning = ui.spinning,
+                        modifier = Modifier.weight(1f)
+                    )
                 }
             }
 
             Spacer(Modifier.height(12.dp))
-            Text("${stringResource(R.string.chips)}: ${ui.chips}", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            Text(
+                "${stringResource(R.string.chips)}: ${ui.chips}",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold
+            )
             Text("${stringResource(R.string.max)}: ${ui.maxChips}", fontSize = 14.sp)
             Text("${stringResource(R.string.last_prize)}: ${ui.lastWin}", fontSize = 14.sp)
             Text("Resultado: ${ui.lastCombo}")
@@ -113,24 +133,45 @@ fun SlotApp(
                     onClick = {
                         val t = vm.requestSpin()
                         if (t.isEmpty()) return@Button
+
+                        // so al premer el boto
+                        SlotSoundManager.playSpin()
+
                         scope.launch {
                             spinOne(reelA, t[0], 20, 800)
                             spinOne(reelB, t[1], 24, 1050)
                             spinOne(reelC, t[2], 28, 1300)
-                            vm.finalizeSpin(t)
+
+                            val finalTargets = listOf(idx(reelA), idx(reelB), idx(reelC))
+                            vm.finalizeSpin(finalTargets)
+
+                            // notificacio si hi ha premi
+                            val prize = vm.ui.lastWin
+                            if (prize > 0) {
+                                NotificationUtils.showWinNotification(
+                                    context = ctx,
+                                    prize = prize,
+                                    chips = vm.ui.chips,
+                                    maxChips = vm.ui.maxChips
+                                )
+                            }
                         }
                     }
-                ) { Text(stringResource(R.string.spin)) }
+                ) {
+                    Text(stringResource(R.string.spin))
+                }
 
                 OutlinedButton(
                     enabled = !ui.spinning,
                     onClick = {
                         vm.cashOut(
-                            onSaved = {  },
-                            onError = {  }
+                            onSaved = { },
+                            onError = { }
                         )
                     }
-                ) { Text(stringResource(R.string.cash_out)) }
+                ) {
+                    Text(stringResource(R.string.cash_out))
+                }
             }
         }
     }

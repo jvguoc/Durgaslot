@@ -14,11 +14,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        SlotSoundManager.init(applicationContext)   // test init de so - potser afegir onDestroy
+        NotificationUtils.createChannel(applicationContext) // test notificacio
+
+        requestNotificationPermissionIfNeeded() // demanar permis per notifs abans de setContent
+
         setContent {
             MaterialTheme {
                 val nav = rememberNavController()
@@ -94,4 +106,23 @@ class MainActivity : ComponentActivity() {
         }
 
     }
+
+    // test demanar permis notificacio (API >=33)
+    private fun requestNotificationPermissionIfNeeded() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val granted = ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
+
+            if (!granted) {
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                    100
+                )
+            }
+        }
+    }
+
 }
