@@ -21,7 +21,12 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -41,6 +46,8 @@ fun HistoryScreen(
     val vm: HistoryVM = viewModel(factory = HistoryVMFactory(ctx))
     val ui = vm.ui
 
+    var cleared by remember { mutableStateOf(false) }
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -51,6 +58,13 @@ fun HistoryScreen(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Volver al menú"
                         )
+                    }
+                },
+                actions = {
+                    TextButton(
+                        onClick = { cleared = true }
+                    ) {
+                        Text("Limpiar")
                     }
                 }
             )
@@ -84,12 +98,20 @@ fun HistoryScreen(
                 }
 
                 else -> {
-                    if (ui.scores.isEmpty()) {
+                    // Ordenar por fecha (más reciente primero)
+                    val visibleScores: List<ScoreEntity> =
+                        if (cleared) {
+                            emptyList()
+                        } else {
+                            ui.scores.sortedByDescending { it.savedAtMillis }
+                        }
+
+                    if (visibleScores.isEmpty()) {
                         Box(
                             modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text("No hay partidas guardadas todavía.")
+                            Text("No hay partidas guardadas visibles.")
                         }
                     } else {
                         LazyColumn(
@@ -98,7 +120,7 @@ fun HistoryScreen(
                                 .padding(16.dp),
                             verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            items(ui.scores) { score ->
+                            items(visibleScores) { score ->
                                 HistoryItem(score = score)
                             }
                         }

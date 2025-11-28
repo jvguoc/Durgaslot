@@ -38,7 +38,6 @@ class MainActivity : ComponentActivity() {
         requestCalendarPermissionsIfNeeded()
         requestLocationPermissionIfNeeded()
 
-
         setContent {
             MaterialTheme {
                 val nav = rememberNavController()
@@ -187,18 +186,19 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun requestLocationPermissionIfNeeded() {
-        val perms = arrayOf(
-            Manifest.permission.ACCESS_COARSE_LOCATION,
-            Manifest.permission.ACCESS_FINE_LOCATION
-        )
+        val perm = Manifest.permission.ACCESS_COARSE_LOCATION
 
-        val missing = perms.any {
-            ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED
-        }
+        val granted = ContextCompat.checkSelfPermission(this, perm) ==
+                PackageManager.PERMISSION_GRANTED
 
-        if (missing) {
-            ActivityCompat.requestPermissions(this, perms, 300)
+        if (!granted) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(perm),
+                300
+            )
         }
     }
+
 
 }

@@ -175,7 +175,7 @@ fun SlotApp(
                 OutlinedButton(
                     enabled = !ui.spinning,
                     onClick = {
-                        val location = "Desconocida"
+                        val location = LocationUtils.getCity(ctx)
                         vm.cashOut(
                             location = location,
                             onSaved = { },
