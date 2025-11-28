@@ -1,19 +1,21 @@
 @file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
-
 package com.durgasoft.slot.history
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -22,60 +24,103 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 
 @Composable
-fun HistoryScreen(onBack: () -> Unit) {
+fun HistoryScreen(
+    onBack: () -> Unit
+) {
     val ctx = LocalContext.current
     val vm: HistoryVM = viewModel(factory = HistoryVMFactory(ctx))
     val ui = vm.ui
 
-    LaunchedEffect(Unit) { vm.loadTop7() }
-
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Top puntuaciones", fontWeight = FontWeight.ExtraBold) },
+                title = { Text("Historial de partidas") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Volver"
+                            contentDescription = "Volver al menú"
                         )
                     }
                 }
             )
         }
     ) { pad ->
-        Column(
+        Box(
             modifier = Modifier
                 .padding(pad)
                 .fillMaxSize()
-                .padding(16.dp)
         ) {
             when {
-                ui.loading -> Text("Cargando...")
-                ui.error != null -> Text("Error: ${ui.error}")
+                ui.loading -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = androidx.compose.ui.Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
+
+                ui.error != null -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = androidx.compose.ui.Alignment.Center
+                    ) {
+                        Text(text = ui.error, color = MaterialTheme.colorScheme.error)
+                    }
+                }
+
                 else -> {
-                    val fmt = remember { SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()) }
-                    LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        itemsIndexed(ui.top) { index, item ->
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Text("${index + 1}. ${item.maxChips}", fontWeight = FontWeight.Bold)
-                                Text(fmt.format(Date(item.savedAtMillis)))
+                    if (ui.scores.isEmpty()) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = androidx.compose.ui.Alignment.Center
+                        ) {
+                            Text("No hay partidas guardadas todavía.")
+                        }
+                    } else {
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            items(ui.scores) { score ->
+                                HistoryItem(score = score)
                             }
                         }
-                    }
-                    if (ui.top.isEmpty()) {
-                        Spacer(Modifier.height(8.dp))
-                        Text("Sin puntuaciones todavía.")
                     }
                 }
             }
         }
     }
+}
+
+@Composable
+private fun HistoryItem(score: com.durgasoft.slot.data.ScoreEntity) {
+    val dateText = rememberDate(score.savedAtMillis)
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Column(modifier = Modifier.padding(12.dp)) {
+            Text(
+                text = "Puntuación máxima: ${score.maxChips}",
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+            )
+            Text(
+                text = "Fecha: $dateText",
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
+    }
+}
+
+@Composable
+private fun rememberDate(millis: Long): String {
+    val df = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+    return df.format(Date(millis))
 }

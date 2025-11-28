@@ -21,17 +21,22 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.durgasoft.slot.NotificationUtils
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Help
+// Si HelpScreen está en com.durgasoft.slot:
+import com.durgasoft.slot.HelpScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        SlotSoundManager.init(applicationContext)   // test init de so - potser afegir onDestroy
-        NotificationUtils.createChannel(applicationContext) // test notificacio
+        SlotSoundManager.init(applicationContext)
+        NotificationUtils.createChannel(applicationContext)
 
-        requestNotificationPermissionIfNeeded() // demanar permis per notifs abans de setContent
-        requestCalendarPermissionsIfNeeded()    // demanar permis per calendar
+        requestNotificationPermissionIfNeeded()
+        requestCalendarPermissionsIfNeeded()
+        requestLocationPermissionIfNeeded()
 
 
         setContent {
@@ -41,8 +46,19 @@ class MainActivity : ComponentActivity() {
                 androidx.compose.material3.Scaffold(
                     topBar = {
                         androidx.compose.material3.CenterAlignedTopAppBar(
-                            title = { androidx.compose.material3.Text("") }, // necessari?
+                            title = { androidx.compose.material3.Text("") },
                             actions = {
+                                // BOTÓN AYUDA
+                                androidx.compose.material3.IconButton(
+                                    onClick = { nav.navigate("help") }
+                                ) {
+                                    androidx.compose.material3.Icon(
+                                        imageVector = Icons.Filled.Help,
+                                        contentDescription = "Ayuda"
+                                    )
+                                }
+
+                                // BOTÓN MÚSICA
                                 MusicToggleButton()
                             }
                         )
@@ -64,7 +80,10 @@ class MainActivity : ComponentActivity() {
                             composable("slot") {
                                 SlotApp(
                                     onBack = {
-                                        val popped = nav.popBackStack(route = "menu", inclusive = false)
+                                        val popped = nav.popBackStack(
+                                            route = "menu",
+                                            inclusive = false
+                                        )
                                         if (!popped) {
                                             nav.navigate("menu") {
                                                 launchSingleTop = true
@@ -78,7 +97,10 @@ class MainActivity : ComponentActivity() {
                             composable("top") {
                                 HistoryScreen(
                                     onBack = {
-                                        val popped = nav.popBackStack(route = "menu", inclusive = false)
+                                        val popped = nav.popBackStack(
+                                            route = "menu",
+                                            inclusive = false
+                                        )
                                         if (!popped) {
                                             nav.navigate("menu") {
                                                 launchSingleTop = true
@@ -92,7 +114,28 @@ class MainActivity : ComponentActivity() {
                             composable("tabla") {
                                 TableScreen(
                                     onBack = {
-                                        val popped = nav.popBackStack(route = "menu", inclusive = false)
+                                        val popped = nav.popBackStack(
+                                            route = "menu",
+                                            inclusive = false
+                                        )
+                                        if (!popped) {
+                                            nav.navigate("menu") {
+                                                launchSingleTop = true
+                                                popUpTo("menu") { inclusive = false }
+                                            }
+                                        }
+                                    }
+                                )
+                            }
+
+                            // NUEVO: pantalla de ayuda (WebView)
+                            composable("help") {
+                                HelpScreen(
+                                    onBack = {
+                                        val popped = nav.popBackStack(
+                                            route = "menu",
+                                            inclusive = false
+                                        )
                                         if (!popped) {
                                             nav.navigate("menu") {
                                                 launchSingleTop = true
@@ -110,7 +153,7 @@ class MainActivity : ComponentActivity() {
 
     }
 
-    // test demanar permis notificacio (API >=33)
+    // PERMISSOS
     private fun requestNotificationPermissionIfNeeded() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             val granted = ContextCompat.checkSelfPermission(
@@ -128,7 +171,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    // test demanar permis calendar (API >=33)
     private fun requestCalendarPermissionsIfNeeded() {
         val perms = arrayOf(
             Manifest.permission.READ_CALENDAR,
@@ -144,5 +186,19 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    private fun requestLocationPermissionIfNeeded() {
+        val perms = arrayOf(
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        )
+
+        val missing = perms.any {
+            ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED
+        }
+
+        if (missing) {
+            ActivityCompat.requestPermissions(this, perms, 300)
+        }
+    }
 
 }

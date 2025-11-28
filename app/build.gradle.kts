@@ -78,5 +78,8 @@ dependencies {
     // Iconos extendidos (flecha back)
     implementation("androidx.compose.material:material-icons-extended:1.7.5")
 
+    // Location
+    implementation("com.google.android.gms:play-services-location:21.0.1")
+
 
 }

@@ -33,8 +33,6 @@ import kotlinx.coroutines.withContext
 import kotlin.math.floor
 import kotlin.math.roundToInt
 import androidx.core.view.drawToBitmap
-import com.durgasoft.slot.GalleryUtils
-import com.durgasoft.slot.NotificationUtils
 
 @Composable
 fun SlotApp(
@@ -160,17 +158,13 @@ fun SlotApp(
                                     maxChips = vm.ui.maxChips
                                 )
 
-                                // capturar pantalla
                                 val bitmap = view.drawToBitmap()
 
-                                // notif
                                 withContext(Dispatchers.IO) {
                                     GalleryUtils.saveVictoryScreenshot(ctx, bitmap)
                                 }
 
-                                // calendar
                                 CalendarUtils.insertVictoryEvent(ctx, prize)
-
                             }
                         }
                     }

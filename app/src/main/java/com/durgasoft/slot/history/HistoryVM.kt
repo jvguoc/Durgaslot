@@ -5,40 +5,73 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.durgasoft.slot.data.ScoreEntity
+import com.durgasoft.slot.data.SlotRepository
 import com.durgasoft.slot.data.ServiceLocator
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 
 data class HistoryUiState(
+    val scores: List<ScoreEntity> = emptyList(),
     val loading: Boolean = true,
-    val top: List<ScoreEntity> = emptyList(),
     val error: String? = null
 )
 
-class HistoryVM(context: Context) : ViewModel() {
-    private val repo = ServiceLocator.repo(context)
+class HistoryVM(
+    private val repository: SlotRepository
+) : ViewModel() {
+
     private val disposables = CompositeDisposable()
 
-    var ui by mutableStateOf(HistoryUiState())
-        private set
+    private var _ui by mutableStateOf(HistoryUiState())
+    val ui: HistoryUiState get() = _ui
 
-    fun loadTop7() {
-        ui = ui.copy(loading = true, error = null)
-        val d = repo.getTop7()
+    init {
+        loadTop()
+    }
+
+    fun loadTop() {
+        _ui = _ui.copy(loading = true, error = null)
+
+        val d = repository.getTop7()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({ list ->
-                ui = ui.copy(loading = false, top = list, error = null)
-            }, { e ->
-                ui = ui.copy(loading = false, error = e.message ?: "Error")
-            })
+            .subscribe(
+                { list ->
+                    _ui = _ui.copy(
+                        scores = list,
+                        loading = false,
+                        error = null
+                    )
+                },
+                { error ->
+                    _ui = _ui.copy(
+                        loading = false,
+                        error = error.message ?: "Error al cargar el historial"
+                    )
+                }
+            )
+
         disposables.add(d)
     }
 
     override fun onCleared() {
         super.onCleared()
         disposables.clear()
+    }
+}
+
+class HistoryVMFactory(
+    private val context: Context
+) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(HistoryVM::class.java)) {
+            val repo = ServiceLocator.provideRepository(context)
+            @Suppress("UNCHECKED_CAST")
+            return HistoryVM(repo) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
