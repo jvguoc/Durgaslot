@@ -11,6 +11,7 @@ class SlotRepository(
 
     fun saveScore(
         maxChips: Int,
+        location: String?,
         onSaved: () -> Unit,
         onError: () -> Unit
     ) {
@@ -18,7 +19,8 @@ class SlotRepository(
             scoreDao.insert(
                 ScoreEntity(
                     maxChips = maxChips,
-                    savedAtMillis = System.currentTimeMillis()
+                    savedAtMillis = System.currentTimeMillis(),
+                    location = location
                 )
             )
         }

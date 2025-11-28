@@ -1,7 +1,13 @@
 @file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+
 package com.durgasoft.slot.history
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -16,11 +22,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.durgasoft.slot.data.ScoreEntity
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -57,7 +65,7 @@ fun HistoryScreen(
                 ui.loading -> {
                     Box(
                         modifier = Modifier.fillMaxSize(),
-                        contentAlignment = androidx.compose.ui.Alignment.Center
+                        contentAlignment = Alignment.Center
                     ) {
                         CircularProgressIndicator()
                     }
@@ -66,9 +74,12 @@ fun HistoryScreen(
                 ui.error != null -> {
                     Box(
                         modifier = Modifier.fillMaxSize(),
-                        contentAlignment = androidx.compose.ui.Alignment.Center
+                        contentAlignment = Alignment.Center
                     ) {
-                        Text(text = ui.error, color = MaterialTheme.colorScheme.error)
+                        Text(
+                            text = ui.error,
+                            color = MaterialTheme.colorScheme.error
+                        )
                     }
                 }
 
@@ -76,7 +87,7 @@ fun HistoryScreen(
                     if (ui.scores.isEmpty()) {
                         Box(
                             modifier = Modifier.fillMaxSize(),
-                            contentAlignment = androidx.compose.ui.Alignment.Center
+                            contentAlignment = Alignment.Center
                         ) {
                             Text("No hay partidas guardadas todavía.")
                         }
@@ -99,8 +110,9 @@ fun HistoryScreen(
 }
 
 @Composable
-private fun HistoryItem(score: com.durgasoft.slot.data.ScoreEntity) {
+private fun HistoryItem(score: ScoreEntity) {
     val dateText = rememberDate(score.savedAtMillis)
+    val locText = score.location ?: "Desconocida"
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -113,6 +125,10 @@ private fun HistoryItem(score: com.durgasoft.slot.data.ScoreEntity) {
             )
             Text(
                 text = "Fecha: $dateText",
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Text(
+                text = "Ubicación: $locText",
                 style = MaterialTheme.typography.bodyMedium
             )
         }

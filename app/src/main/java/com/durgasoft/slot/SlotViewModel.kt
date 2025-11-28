@@ -67,7 +67,6 @@ class SlotViewModel(
         val c1 = combo[1]
         val c2 = combo[2]
 
-        // triples
         if (c0 == c1 && c1 == c2) {
             return when (c0) {
                 "7" -> 100
@@ -80,7 +79,6 @@ class SlotViewModel(
             }
         }
 
-        // combos con BAR
         val count7 = combo.count { it == "7" }
         val countA = combo.count { it == "A" }
         val countK = combo.count { it == "K" }
@@ -100,6 +98,7 @@ class SlotViewModel(
     }
 
     fun cashOut(
+        location: String?,
         onSaved: () -> Unit,
         onError: () -> Unit
     ) {
@@ -107,6 +106,7 @@ class SlotViewModel(
 
         repository.saveScore(
             maxChips = score,
+            location = location,
             onSaved = {
                 _uiState = SlotUiState()
                 onSaved()
