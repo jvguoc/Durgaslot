@@ -30,9 +30,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.durgasoft.slot.R
 import com.durgasoft.slot.data.ScoreEntity
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -51,12 +53,12 @@ fun HistoryScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Historial de partidas") },
+                title = { Text(stringResource(R.string.history_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Volver al menú"
+                            contentDescription = null
                         )
                     }
                 },
@@ -64,7 +66,7 @@ fun HistoryScreen(
                     TextButton(
                         onClick = { cleared = true }
                     ) {
-                        Text("Limpiar")
+                        Text(stringResource(R.string.history_clear))
                     }
                 }
             )
@@ -98,7 +100,6 @@ fun HistoryScreen(
                 }
 
                 else -> {
-                    // Ordenar por fecha (más reciente primero)
                     val visibleScores: List<ScoreEntity> =
                         if (cleared) {
                             emptyList()
@@ -111,7 +112,7 @@ fun HistoryScreen(
                             modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text("No hay partidas guardadas visibles.")
+                            Text(stringResource(R.string.history_empty_visible))
                         }
                     } else {
                         LazyColumn(
@@ -142,15 +143,15 @@ private fun HistoryItem(score: ScoreEntity) {
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
             Text(
-                text = "Puntuación máxima: ${score.maxChips}",
+                text = stringResource(R.string.history_item_score, score.maxChips),
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
             )
             Text(
-                text = "Fecha: $dateText",
+                text = stringResource(R.string.history_item_date, dateText),
                 style = MaterialTheme.typography.bodyMedium
             )
             Text(
-                text = "Ubicación: $locText",
+                text = stringResource(R.string.history_item_location, locText),
                 style = MaterialTheme.typography.bodyMedium
             )
         }

@@ -2,7 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    id("kotlin-kapt") // <-- NECESARIO para que funcione kapt(...)
+    id("kotlin-kapt") // <-- NECESSARI per a que funcioni kapt(...)
+    id("com.google.gms.google-services") version "4.4.4" apply false // <- declaracio de versio necessaria per versio de glade utilitzada
 }
 
 android {
@@ -81,5 +82,10 @@ dependencies {
     // Location
     implementation("com.google.android.gms:play-services-location:21.0.1")
 
+    // Firebase + AUTH
+    implementation(platform("com.google.firebase:firebase-bom:34.6.0"))
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-analytics")
+    //implementation("com.google.android.gms:play-services-auth:21.2.0")
 
 }

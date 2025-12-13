@@ -1,0 +1,31 @@
+<resources>
+    <string name="app_name">Durgaslot</string>
+
+    <!-- Slot screen -->
+    <string name="slot_title">Slot Machine</string>
+    <string name="chips">Chips</string>
+    <string name="max">Max</string>
+    <string name="last_prize">Last prize</string>
+    <string name="result">Result</string>
+    <string name="spin">Spin</string>
+    <string name="cash_out">Cash out</string>
+
+    <!-- Main menu -->
+    <string name="menu_play">Play</string>
+    <string name="menu_top">History</string>
+    <string name="menu_table">Payout table</string>
+
+    <!-- History -->
+    <string name="history_title">Game history</string>
+    <string name="history_clear">Clear</string>
+    <string name="history_empty_visible">No saved games to show.</string>
+    <string name="history_item_score">Max score: %1$d</string>
+    <string name="history_item_date">Date: %1$s</string>
+    <string name="history_item_location">Location: %1$s</string>
+
+    <!-- Notifications -->
+    <string name="notification_channel_name">Wins</string>
+    <string name="notification_channel_desc">Notifications for slot machine wins</string>
+    <string name="notification_title">Win!</string>
+    <string name="notification_text">You won %1$d chips. Balance: %2$d (max: %3$d)</string>
+</resources>

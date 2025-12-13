@@ -1,9 +1,31 @@
 <resources>
     <string name="app_name">Durgaslot</string>
-    <string name="spin">Girar (1 ficha)</string>
-    <string name="cash_out">Terminar</string>
+
+    <!-- Pantalla slot -->
+    <string name="slot_title">Tragaperras</string>
     <string name="chips">Fichas</string>
     <string name="max">Máximo</string>
-    <string name="last_prize">Premio último giro</string>
-    <string name="slot_title">SLOT MACHINE</string>
+    <string name="last_prize">Último premio</string>
+    <string name="result">Resultado</string>
+    <string name="spin">Jugar</string>
+    <string name="cash_out">Terminar</string>
+
+    <!-- Menú principal -->
+    <string name="menu_play">Jugar</string>
+    <string name="menu_top">Historial</string>
+    <string name="menu_table">Tabla de premios</string>
+
+    <!-- Historial -->
+    <string name="history_title">Historial de partidas</string>
+    <string name="history_clear">Limpiar</string>
+    <string name="history_empty_visible">No hay partidas guardadas visibles.</string>
+    <string name="history_item_score">Puntuación máxima: %1$d</string>
+    <string name="history_item_date">Fecha: %1$s</string>
+    <string name="history_item_location">Ubicación: %1$s</string>
+
+    <!-- Notificaciones -->
+    <string name="notification_channel_name">Victorias</string>
+    <string name="notification_channel_desc">Notificaciones de victorias en la tragaperras</string>
+    <string name="notification_title">¡Victoria!</string>
+    <string name="notification_text">Has ganado %1$d fichas. Saldo: %2$d (máx: %3$d)</string>
 </resources>

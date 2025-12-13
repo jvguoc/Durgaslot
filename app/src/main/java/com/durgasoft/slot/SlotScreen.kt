@@ -27,6 +27,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.durgasoft.slot.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -72,7 +73,7 @@ fun SlotApp(
                     IconButton(onClick = onBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Volver al menú"
+                            contentDescription = null
                         )
                     }
                 }
@@ -127,9 +128,17 @@ fun SlotApp(
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold
             )
-            Text("${stringResource(R.string.max)}: ${ui.maxChips}", fontSize = 14.sp)
-            Text("${stringResource(R.string.last_prize)}: ${ui.lastWin}", fontSize = 14.sp)
-            Text("Resultado: ${ui.lastCombo}")
+            Text(
+                "${stringResource(R.string.max)}: ${ui.maxChips}",
+                fontSize = 14.sp
+            )
+            Text(
+                "${stringResource(R.string.last_prize)}: ${ui.lastWin}",
+                fontSize = 14.sp
+            )
+            Text(
+                "${stringResource(R.string.result)}: ${ui.lastCombo}"
+            )
 
             Spacer(Modifier.height(20.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -175,7 +184,7 @@ fun SlotApp(
                 OutlinedButton(
                     enabled = !ui.spinning,
                     onClick = {
-                        val location = LocationUtils.getCity(ctx)
+                        val location = "Desconocida"
                         vm.cashOut(
                             location = location,
                             onSaved = { },
