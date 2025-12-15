@@ -26,14 +26,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.view.drawToBitmap
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.durgasoft.slot.R
+import com.google.firebase.auth.FirebaseAuth
+import com.durgasoft.slot.remote.FirebaseRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.math.floor
 import kotlin.math.roundToInt
-import androidx.core.view.drawToBitmap
 
 @Composable
 fun SlotApp(
@@ -187,7 +188,25 @@ fun SlotApp(
                         val location = "Desconocida"
                         vm.cashOut(
                             location = location,
-                            onSaved = { },
+                            onSaved = {
+                                val user = FirebaseAuth.getInstance().currentUser ?: return@cashOut
+                                val name = user.displayName ?: user.email ?: "Player"
+                                val maxChips = vm.ui.maxChips
+                                val ts = System.currentTimeMillis()
+
+                                scope.launch {
+                                    try {
+                                        FirebaseRepository().uploadScore(
+                                            uid = user.uid,
+                                            name = name,
+                                            maxChips = maxChips,
+                                            timestamp = ts
+                                        )
+                                    } catch (e: Exception) {
+                                        android.util.Log.e("FIREBASE_RTDB", "uploadScore failed", e)
+                                    }
+                                }
+                            },
                             onError = { }
                         )
                     }

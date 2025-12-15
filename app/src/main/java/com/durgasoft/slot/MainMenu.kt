@@ -34,42 +34,22 @@ fun MainMenu(
                 .padding(horizontal = 20.dp, vertical = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Logo superior
             Image(
                 painter = painterResource(id = slotMachineIcon),
                 contentDescription = "Logo SlotMachine",
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(288.dp),   // antes 96.dp
+                    .height(288.dp),
                 contentScale = ContentScale.Fit
             )
 
             Spacer(Modifier.height(24.dp))
 
-            // Botón JUGAR
-            FullWidthImageButton(
-                resId = btJugar,
-                desc = "Jugar",
-                onClick = onPlay
-            )
-
+            FullWidthImageButton(btJugar, "Jugar", onPlay)
             Spacer(Modifier.height(14.dp))
-
-            // Botón Top
-            FullWidthImageButton(
-                resId = btTop,
-                desc = "Top",
-                onClick = onTop
-            )
-
+            FullWidthImageButton(btTop, "Top", onTop)
             Spacer(Modifier.height(14.dp))
-
-            // Botón Tabla
-            FullWidthImageButton(
-                resId = btTabla,
-                desc = "Tabla",
-                onClick = onTabla
-            )
+            FullWidthImageButton(btTabla, "Tabla", onTabla)
         }
     }
 }
@@ -85,7 +65,7 @@ private fun FullWidthImageButton(
         contentDescription = desc,
         modifier = Modifier
             .fillMaxWidth()
-            .height(120.dp)                 // altura aumentada, revisar si hace falta aumentar mas o tocar el png
+            .height(120.dp)
             .clip(RoundedCornerShape(12.dp))
             .clickable(onClick = onClick)
             .semantics { contentDescription = desc },

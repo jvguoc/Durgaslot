@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "552382000764-j3vsfm8f7qgusuhe84ffv1eboa0fu7fb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.durgasoft.slot",
+            "certificate_hash": "250a8354ba1f9df62bb5dedcc4ddb96f6df3961e"
+          }
+        },
+        {
           "client_id": "552382000764-dqgq5jrmfqsssimgkll3h7glnr0o0ipp.apps.googleusercontent.com",
           "client_type": 3
         }
