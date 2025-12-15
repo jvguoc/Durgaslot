@@ -26,15 +26,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.view.drawToBitmap
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.google.firebase.auth.FirebaseAuth
-import com.durgasoft.slot.remote.FirebaseRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.math.floor
 import kotlin.math.roundToInt
+import androidx.core.view.drawToBitmap
+import com.google.firebase.auth.FirebaseAuth
+import com.durgasoft.slot.remote.FirebaseRepository
+import android.util.Log
 
 @Composable
 fun SlotApp(
@@ -44,12 +45,12 @@ fun SlotApp(
     val view = LocalView.current
     val vm: SlotViewModel = viewModel(factory = SlotVMFactory(ctx))
     val ui = vm.ui
+    val scope = rememberCoroutineScope()
 
     val n = vm.symbols.size
     val reelA = remember { Animatable(ui.currentReels[0].toFloat(), Float.VectorConverter) }
     val reelB = remember { Animatable(ui.currentReels[1].toFloat(), Float.VectorConverter) }
     val reelC = remember { Animatable(ui.currentReels[2].toFloat(), Float.VectorConverter) }
-    val scope = rememberCoroutineScope()
 
     fun idx(a: Animatable<Float, *>) = ((floor(a.value) % n + n) % n).toInt()
 
@@ -186,24 +187,31 @@ fun SlotApp(
                     enabled = !ui.spinning,
                     onClick = {
                         val location = "Desconocida"
+
+                        val maxToUpload = ui.maxChips
+                        val tsToUpload = System.currentTimeMillis()
+
                         vm.cashOut(
                             location = location,
                             onSaved = {
-                                val user = FirebaseAuth.getInstance().currentUser ?: return@cashOut
+                                val user = FirebaseAuth.getInstance().currentUser
+                                if (user == null) {
+                                    Log.e("FIREBASE_RTDB", "No user logged in, cannot upload score")
+                                    return@cashOut
+                                }
+
                                 val name = user.displayName ?: user.email ?: "Player"
-                                val maxChips = vm.ui.maxChips
-                                val ts = System.currentTimeMillis()
 
                                 scope.launch {
                                     try {
                                         FirebaseRepository().uploadScore(
                                             uid = user.uid,
                                             name = name,
-                                            maxChips = maxChips,
-                                            timestamp = ts
+                                            maxChips = maxToUpload,
+                                            timestamp = tsToUpload
                                         )
                                     } catch (e: Exception) {
-                                        android.util.Log.e("FIREBASE_RTDB", "uploadScore failed", e)
+                                        Log.e("FIREBASE_RTDB", "uploadScore failed", e)
                                     }
                                 }
                             },

@@ -16,6 +16,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Durgaslot">
 
+        <service
+            android:name=".MusicService"
+            android:exported="false" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
